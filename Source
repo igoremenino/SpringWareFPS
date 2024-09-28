@@ -2,23 +2,23 @@
 -- Se encontrar Erros envie mensagem no meu discord: Themagicloki
 
 if not _G.Ignore then
-    _G.Ignore = {} 
+    _G.Ignore = {}
 end
-
 if not _G.WaitPerAmount then
-    _G.WaitPerAmount = 500 
+    _G.WaitPerAmount = 500
 end
-
-_G.SendNotifications = _G.SendNotifications ~= nil and _G.SendNotifications or true 
-_G.ConsoleLogs = _G.ConsoleLogs ~= nil and _G.ConsoleLogs or false
+if _G.SendNotifications == nil then
+    _G.SendNotifications = true
+end
+if _G.ConsoleLogs == nil then
+    _G.ConsoleLogs = false
+end
 
 if not game:IsLoaded() then
     repeat
         task.wait()
     until game:IsLoaded()
 end
-
--- Configurações padrão
 if not _G.Settings then
     _G.Settings = {
         Players = {
@@ -70,227 +70,139 @@ if not _G.Settings then
         }
     }
 end
-
-local Players = game:GetService("Players")
-local Lighting = game:GetService("Lighting")
-local StarterGui = game:GetService("StarterGui")
-local MaterialService = game:GetService("MaterialService")
-local ME = Players.LocalPlayer
-local CanBeEnabled = {"ParticleEmitter", "Trail", "Smoke", "Fire", "Sparkles"}
-
-local function PartOfCharacter(instance)
-    for _, player in pairs(Players:GetPlayers()) do
-        if player ~= ME and player.Character and instance:IsDescendantOf(player.Character) then
+local Players, Lighting, StarterGui, MaterialService = game:GetService("Players"), game:GetService("Lighting"), game:GetService("StarterGui"), game:GetService("MaterialService")
+local ME, CanBeEnabled = Players.LocalPlayer, {"ParticleEmitter", "Trail", "Smoke", "Fire", "Sparkles"}
+local function PartOfCharacter(Instance)
+    for i, v in pairs(Players:GetPlayers()) do
+        if v ~= ME and v.Character and Instance:IsDescendantOf(v.Character) then
             return true
         end
     end
     return false
 end
-
-local function DescendantOfIgnore(instance)
-    for _, ignoredInstance in pairs(_G.Ignore) do
-        if instance:IsDescendantOf(ignoredInstance) then
+local function DescendantOfIgnore(Instance)
+    for i, v in pairs(_G.Ignore) do
+        if Instance:IsDescendantOf(v) then
             return true
         end
     end
     return false
 end
-
-local function CheckIfBad(instance)
-    if not instance:IsDescendantOf(Players) and
-        (_G.Settings.Players["Ignore Others"] and not PartOfCharacter(instance) or not _G.Settings.Players["Ignore Others"]) and
-        (_G.Settings.Players["Ignore Me"] and ME.Character and not instance:IsDescendantOf(ME.Character) or not _G.Settings.Players["Ignore Me"]) and
-        (_G.Settings.Players["Ignore Tools"] and not instance:IsA("BackpackItem") and not instance:FindFirstAncestorWhichIsA("BackpackItem") or not _G.Settings.Players["Ignore Tools"]) and
-        (_G.Ignore and not table.find(_G.Ignore, instance) and not DescendantOfIgnore(instance) or (not _G.Ignore or type(_G.Ignore) ~= "table" or #_G.Ignore <= 0)) then
-        
-        if instance:IsA("DataModelMesh") then
-            if _G.Settings.Meshes.NoMesh and instance:IsA("SpecialMesh") then
-                instance.MeshId = ""
+local function CheckIfBad(Instance)
+    if not Instance:IsDescendantOf(Players) and (_G.Settings.Players["Ignore Others"] and not PartOfCharacter(Instance) or not _G.Settings.Players["Ignore Others"]) and (_G.Settings.Players["Ignore Me"] and ME.Character and not Instance:IsDescendantOf(ME.Character) or not _G.Settings.Players["Ignore Me"]) and (_G.Settings.Players["Ignore Tools"] and not Instance:IsA("BackpackItem") and not Instance:FindFirstAncestorWhichIsA("BackpackItem") or not _G.Settings.Players["Ignore Tools"]) and (_G.Ignore and not table.find(_G.Ignore, Instance) and not DescendantOfIgnore(Instance) or (not _G.Ignore or type(_G.Ignore) ~= "table" or #_G.Ignore <= 0)) then
+        if Instance:IsA("DataModelMesh") then
+            if _G.Settings.Meshes.NoMesh and Instance:IsA("SpecialMesh") then
+                Instance.MeshId = ""
             end
-            if _G.Settings.Meshes.NoTexture and instance:IsA("SpecialMesh") then
-                instance.TextureId = ""
+            if _G.Settings.Meshes.NoTexture and Instance:IsA("SpecialMesh") then
+                Instance.TextureId = ""
             end
-            if _G.Settings.Meshes.Destroy then
-                instance:Destroy()
+            if _G.Settings.Meshes.Destroy or _G.Settings["No Meshes"] then
+                Instance:Destroy()
             end
-
-        elseif instance:IsA("FaceInstance") then
+        elseif Instance:IsA("FaceInstance") then
             if _G.Settings.Images.Invisible then
-                instance.Transparency = 1
-                instance.Shiny = 1
+                Instance.Transparency = 1
+                Instance.Shiny = 1
+            end
+            if _G.Settings.Images.LowDetail then
+                Instance.Shiny = 1
             end
             if _G.Settings.Images.Destroy then
-                instance:Destroy()
+                Instance:Destroy()
             end
-
-        elseif instance:IsA("ShirtGraphic") then
+        elseif Instance:IsA("ShirtGraphic") then
             if _G.Settings.Images.Invisible then
-                instance.Graphic = ""
+                Instance.Graphic = ""
             end
             if _G.Settings.Images.Destroy then
-                instance:Destroy()
+                Instance:Destroy()
             end
-
-        elseif table.find(CanBeEnabled, instance.ClassName) then
-            if _G.Settings.Particles.Invisible then
-                instance.Enabled = false
+        elseif table.find(CanBeEnabled, Instance.ClassName) then
+            if _G.Settings["Invisible Particles"] or _G.Settings["No Particles"] or (_G.Settings.Other and _G.Settings.Other["Invisible Particles"]) or (_G.Settings.Particles and _G.Settings.Particles.Invisible) then
+                Instance.Enabled = false
             end
-            if _G.Settings.Particles.Destroy then
-                instance:Destroy()
+            if (_G.Settings.Other and _G.Settings.Other["No Particles"]) or (_G.Settings.Particles and _G.Settings.Particles.Destroy) then
+                Instance:Destroy()
             end
-
-        elseif instance:IsA("PostEffect") and _G.Settings["No Camera Effects"] then
-            instance.Enabled = false
-
-        elseif instance:IsA("Explosion") then
-            if _G.Settings.Explosions.Smaller then
-                instance.BlastPressure = 1
-                instance.BlastRadius = 1
+        elseif Instance:IsA("PostEffect") and (_G.Settings["No Camera Effects"] or (_G.Settings.Other and _G.Settings.Other["No Camera Effects"])) then
+            Instance.Enabled = false
+        elseif Instance:IsA("Explosion") then
+            if _G.Settings["Smaller Explosions"] or (_G.Settings.Other and _G.Settings.Other["Smaller Explosions"]) or (_G.Settings.Explosions and _G.Settings.Explosions.Smaller) then
+                Instance.BlastPressure = 1
+                Instance.BlastRadius = 1
             end
-            if _G.Settings.Explosions.Invisible then
-                instance.BlastPressure = 1
-                instance.BlastRadius = 1
-                instance.Visible = false
+            if _G.Settings["Invisible Explosions"] or (_G.Settings.Other and _G.Settings.Other["Invisible Explosions"]) or (_G.Settings.Explosions and _G.Settings.Explosions.Invisible) then
+                Instance.BlastPressure = 1
+                Instance.BlastRadius = 1
+                Instance.Visible = false
             end
-            if _G.Settings.Explosions.Destroy then
-                instance:Destroy()
+            if _G.Settings["No Explosions"] or (_G.Settings.Other and _G.Settings.Other["No Explosions"]) or (_G.Settings.Explosions and _G.Settings.Explosions.Destroy) then
+                Instance:Destroy()
             end
-
-        elseif (instance:IsA("Clothing") or instance:IsA("SurfaceAppearance") or instance:IsA("BaseWrap")) and _G.Settings["No Clothes"] then
-            instance:Destroy()
-
-        elseif instance:IsA("BasePart") and not instance:IsA("MeshPart") and _G.Settings["Low Quality Parts"] then
-            instance.Material = Enum.Material.Plastic
-            instance.Reflectance = 0
-
-        elseif instance:IsA("TextLabel") and instance:IsDescendantOf(workspace) then
-            if _G.Settings.TextLabels.LowerQuality then
-                instance.Font = Enum.Font.SourceSans
-                instance.TextScaled = false
-                instance.RichText = false
-                instance.TextSize = 14
+        elseif Instance:IsA("Clothing") or Instance:IsA("SurfaceAppearance") or Instance:IsA("BaseWrap") then
+            if _G.Settings["No Clothes"] or (_G.Settings.Other and _G.Settings.Other["No Clothes"]) then
+                Instance:Destroy()
             end
-            if _G.Settings.TextLabels.Invisible then
-                instance.Visible = false
+        elseif Instance:IsA("BasePart") and not Instance:IsA("MeshPart") then
+            if _G.Settings["Low Quality Parts"] or (_G.Settings.Other and _G.Settings.Other["Low Quality Parts"]) then
+                Instance.Material = Enum.Material.Plastic
+                Instance.Reflectance = 0
             end
-            if _G.Settings.TextLabels.Destroy then
-                instance:Destroy()
+        elseif Instance:IsA("TextLabel") and Instance:IsDescendantOf(workspace) then
+            if _G.Settings["Lower Quality TextLabels"] or (_G.Settings.Other and _G.Settings.Other["Lower Quality TextLabels"]) or (_G.Settings.TextLabels and _G.Settings.TextLabels.LowerQuality) then
+                Instance.Font = Enum.Font.SourceSans
+                Instance.TextScaled = false
+                Instance.RichText = false
+                Instance.TextSize = 14
             end
-
-        elseif instance:IsA("Model") and _G.Settings["Low Quality Models"] then
-            instance.LevelOfDetail = 1
-
-        elseif instance:IsA("MeshPart") then
-            if _G.Settings.MeshParts.LowerQuality then
-                instance.RenderFidelity = 2
-                instance.Reflectance = 0
-                instance.Material = Enum.Material.Plastic
+            if _G.Settings["Invisible TextLabels"] or (_G.Settings.Other and _G.Settings.Other["Invisible TextLabels"]) or (_G.Settings.TextLabels and _G.Settings.TextLabels.Invisible) then
+                Instance.Visible = false
             end
-            if _G.Settings.MeshParts.Invisible then
-                instance.Transparency = 1
-                instance.RenderFidelity = 2
-                instance.Reflectance = 0
-                instance.Material = Enum.Material.Plastic
+            if _G.Settings["No TextLabels"] or (_G.Settings.Other and _G.Settings.Other["No TextLabels"]) or (_G.Settings.TextLabels and _G.Settings.TextLabels.Destroy) then
+                Instance:Destroy()
             end
-            if _G.Settings.MeshParts.NoTexture then
-                instance.TextureID = ""
+        elseif Instance:IsA("Model") then
+            if _G.Settings["Low Quality Models"] or (_G.Settings.Other and _G.Settings.Other["Low Quality Models"]) then
+                Instance.LevelOfDetail = 1
             end
-            if _G.Settings.MeshParts.NoMesh then
-                instance.MeshId = ""
+        elseif Instance:IsA("MeshPart") then
+            if _G.Settings["Low Quality MeshParts"] or (_G.Settings.Other and _G.Settings.Other["Low Quality MeshParts"]) or (_G.Settings.MeshParts and _G.Settings.MeshParts.LowerQuality) then
+                Instance.RenderFidelity = 2
+                Instance.Reflectance = 0
+                Instance.Material = Enum.Material.Plastic
             end
-            if _G.Settings.MeshParts.Destroy then
-                instance:Destroy()
+            if _G.Settings["Invisible MeshParts"] or (_G.Settings.Other and _G.Settings.Other["Invisible MeshParts"]) or (_G.Settings.MeshParts and _G.Settings.MeshParts.Invisible) then
+                Instance.Transparency = 1
+                Instance.RenderFidelity = 2
+                Instance.Reflectance = 0
+                Instance.Material = Enum.Material.Plastic
+            end
+            if _G.Settings.MeshParts and _G.Settings.MeshParts.NoTexture then
+                Instance.TextureID = ""
+            end
+            if _G.Settings.MeshParts and _G.Settings.MeshParts.NoMesh then
+                Instance.MeshId = ""
+            end
+            if _G.Settings["No MeshParts"] or (_G.Settings.Other and _G.Settings.Other["No MeshParts"]) or (_G.Settings.MeshParts and _G.Settings.MeshParts.Destroy) then
+                Instance:Destroy()
             end
         end
     end
 end
-
 if _G.SendNotifications then
     StarterGui:SetCore("SendNotification", {
-        Title = "discord.gg/rips",
-        Text = "Loading FPS Booster...",
+        Title = "SpringWare",
+        Text = "Carregando FPS Booster...",
         Duration = math.huge,
         Button1 = "Okay"
     })
 end
-
--- Gráficos de Água Baixos
-coroutine.wrap(pcall)(function()
-    if _G.Settings["Low Water Graphics"] then
-        local terrain = workspace:FindFirstChildOfClass("Terrain")
-        if not terrain then
-            repeat task.wait() until workspace:FindFirstChildOfClass("Terrain")
-            terrain = workspace:FindFirstChildOfClass("Terrain")
-        end
-        terrain.WaterWaveSize = 0
-        terrain.WaterWaveSpeed = 0
-        terrain.WaterReflectance = 0
-        terrain.WaterTransparency = 0
-        if sethiddenproperty then
-            sethiddenproperty(terrain, "Decoration", false)
-        else
-            StarterGui:SetCore("SendNotification", {
-                Title = "discord.gg/rips",
-                Text = "Seu exploit não suporta sethiddenproperty, por favor use um exploit diferente.",
-                Duration = 5,
-                Button1 = "Okay"
-            })
-            warn("Seu exploit não suporta sethiddenproperty, por favor use um exploit diferente.")
-        end
-        if _G.SendNotifications then
-            StarterGui:SetCore("SendNotification", {
-                Title = "discord.gg/rips",
-                Text = "Gráficos de Água Baixos Ativados",
-                Duration = 5,
-                Button1 = "Okay"
-            })
-        end
-        if _G.ConsoleLogs then
-            warn("Gráficos de Água Baixos Ativados")
-        end
+coroutine.wrap(function()
+    for i, v in pairs(workspace:GetChildren()) do
+        CheckIfBad(v)
     end
-end)
-
--- Sem Sombras
-coroutine.wrap(pcall)(function()
-    if _G.Settings["No Shadows"] then
-        Lighting.GlobalShadows = false
-        Lighting.FogEnd = 9e9
-        Lighting.ShadowSoftness = 0
-        if sethiddenproperty then
-            sethiddenproperty(Lighting, "Technology", 2)
-        else
-            StarterGui:SetCore("SendNotification", {
-                Title = "discord.gg/rips",
-                Text = "Seu exploit não suporta sethiddenproperty, por favor use um exploit diferente.",
-                Duration = 5,
-                Button1 = "Okay"
-            })
-            warn("Seu exploit não suporta sethiddenproperty, por favor use um exploit diferente.")
-        end
-        if _G.SendNotifications then
-            StarterGui:SetCore("SendNotification", {
-                Title = "discord.gg/rips",
-                Text = "Sombras Desligadas",
-                Duration = 5,
-                Button1 = "Okay"
-            })
-        end
-        if _G.ConsoleLogs then
-            warn("Sombras Desligadas")
-        end
-    end
-end)
-
--- Melhorar FPS
-task.spawn(function()
-    while task.wait(_G.WaitPerAmount) do
-        for _, instance in pairs(workspace:GetDescendants()) do
-            CheckIfBad(instance)
-        end
-    end
-end)
-
-for _, instance in pairs(workspace:GetDescendants()) do
-    CheckIfBad(instance)
+end)()
+for i, v in pairs(workspace:GetDescendants()) do
+    CheckIfBad(v)
 end
