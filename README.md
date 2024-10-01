@@ -1,18 +1,12 @@
-Update Log - SpringWareFPS
-Versão 1.2.0 - 01 de Outubro, 2024
-Melhorias e Refatorações:
+# SpringWareFPS
 
-Refatoração do Script: Transformação das variáveis globais em locais, reduzindo a poluição do escopo global e aumentando a segurança do código.
+**SpringWareFPS** é um script desenvolvido para otimizar a experiência de jogo no Roblox, permitindo que os jogadores personalizem suas configurações gráficas e de desempenho. Este projeto visa fornecer ferramentas que melhoram a jogabilidade ao reduzir a carga gráfica e aumentar o desempenho em situações de jogo intenso.
 
-Organização das Configurações: Consolidação das configurações em uma tabela única (Settings), facilitando a manutenção e a legibilidade do script.
+## Funcionalidades
 
-Encapsulamento de Funções: Introdução da função loadExternalScript para gerenciar o carregamento de scripts externos com tratamento de erros usando pcall, melhorando a robustez do sistema.
+- **Configurações Personalizadas**: Permite que os jogadores ajustem várias configurações para ignorar jogadores, ferramentas e elementos gráficos.
+- **Controle de Qualidade Gráfica**: Ajuste de explosões, partículas, texturas e qualidade de modelos para otimizar a performance.
+- **Efeitos Visuais**: Opções para desativar sombras, limitar FPS e reduzir gráficos de água, aumentando a fluidez do jogo.
+- **Sistema de Notificações**: Feedback visual ao carregar scripts, informando os usuários sobre o status do carregamento.
+- **Tratamento de Erros**: Mecanismos para lidar com falhas ao carregar scripts externos, garantindo maior robustez.
 
-Comentários Detalhados: Inclusão de comentários em todo o código para explicar a funcionalidade de cada seção, facilitando futuras alterações e a compreensão do código.
-
-Sistema de Notificações: Adição de mensagens de sucesso ao carregar scripts, controladas pela variável SendNotifications, proporcionando feedback visual para o usuário.
-
-Tratamento de Erros: Aprimoramento do tratamento de erros ao carregar scripts via HttpGet, com mensagens detalhadas no console em caso de falha.
-Correções:
-
-Resolução de um problema em que configurações globais poderiam ser sobrescritas inadvertidamente por outros scripts no ambiente, garantindo maior integridade das configurações.
