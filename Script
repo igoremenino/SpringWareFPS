@@ -1,0 +1,76 @@
+-- Versão: 1.2
+
+-- Definindo as variáveis como locais para evitar poluir o escopo global
+local IgnoreList = {}
+local WaitPerAmount = 500
+local SendNotifications = true
+local ConsoleLogs = false
+
+-- Configurações
+-- pode trocar oque voce querer, true para sim e false para não
+local Settings = {
+    Players = {
+        IgnoreMe = true,   -- Ignora o próprio jogador
+        IgnoreOthers = true, -- Ignora outros jogadores
+        IgnoreTools = true   -- Ignora ferramentas
+    },
+    Meshes = {
+        NoMesh = false,
+        NoTexture = false,
+        Destroy = false    -- Configuração para meshes
+    },
+    Images = {
+        Invisible = true,
+        Destroy = false    -- Configuração para imagens
+    },
+    Explosions = {
+        Smaller = true,    -- Explosões menores
+        Invisible = false, -- Explosões invisíveis
+        Destroy = false    -- Configuração para explosões
+    },
+    Particles = {
+        Invisible = true,  -- Partículas invisíveis
+        Destroy = false    -- Configuração para partículas
+    },
+    TextLabels = {
+        LowerQuality = true,   -- Textos em baixa qualidade
+        Invisible = false,
+        Destroy = false    -- Configuração para TextLabels
+    },
+    MeshParts = {
+        LowerQuality = true,   -- MeshParts em baixa qualidade
+        Invisible = false,
+        NoTexture = false,
+        NoMesh = false,
+        Destroy = false    -- Configuração para MeshParts
+    },
+    Other = {
+        FPSCap = true,               -- Limite de FPS
+        NoCameraEffects = true,      -- Remove efeitos de câmera
+        NoClothes = true,            -- Remove roupas
+        LowWaterGraphics = true,     -- Gráficos de água em baixa qualidade
+        NoShadows = true,            -- Sem sombras
+        LowRendering = true,         -- Renderização baixa
+        LowQualityParts = true,      -- Partes em baixa qualidade
+        LowQualityModels = true,     -- Modelos em baixa qualidade
+        ResetMaterials = true        -- Reseta materiais para a qualidade padrão
+    }
+}
+
+
+local function loadExternalScript(url)
+    local success, errorMessage = pcall(function()
+        loadstring(game:HttpGet(url))()
+    end)
+    
+    if not success then
+        warn("Falha ao carregar script externo: " .. errorMessage)
+    else
+        if SendNotifications then
+            print("Script carregado com sucesso.")
+        end
+    end
+end
+
+
+loadExternalScript("https://raw.githubusercontent.com/igoremenino/SpringWareFPS/refs/heads/main/Source")
