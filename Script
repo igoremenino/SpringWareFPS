@@ -1,76 +1,65 @@
--- Versão: 1.2
+_G.Ignore = {}
+_G.WaitPerAmount = 500
+_G.SendNotifications = true
+_G.ConsoleLogs = false
 
--- Definindo as variáveis como locais para evitar poluir o escopo global
-local IgnoreList = {}
-local WaitPerAmount = 500
-local SendNotifications = true
-local ConsoleLogs = false
-
--- Configurações
--- pode trocar oque voce querer, true para sim e false para não
-local Settings = {
+_G.Settings = {
     Players = {
-        IgnoreMe = true,   -- Ignora o próprio jogador
-        IgnoreOthers = true, -- Ignora outros jogadores
-        IgnoreTools = true   -- Ignora ferramentas
+        ["Ignore Me"] = true,
+        ["Ignore Others"] = true,
+        ["Ignore Tools"] = true
     },
     Meshes = {
         NoMesh = false,
         NoTexture = false,
-        Destroy = false    -- Configuração para meshes
+        Destroy = false
     },
     Images = {
         Invisible = true,
-        Destroy = false    -- Configuração para imagens
+        Destroy = false
     },
     Explosions = {
-        Smaller = true,    -- Explosões menores
-        Invisible = false, -- Explosões invisíveis
-        Destroy = false    -- Configuração para explosões
+        Smaller = true,
+        Invisible = false, 
+        Destroy = false 
     },
     Particles = {
-        Invisible = true,  -- Partículas invisíveis
-        Destroy = false    -- Configuração para partículas
+        Invisible = true,
+        Destroy = false
     },
     TextLabels = {
-        LowerQuality = true,   -- Textos em baixa qualidade
+        LowerQuality = true,
         Invisible = false,
-        Destroy = false    -- Configuração para TextLabels
+        Destroy = false
     },
     MeshParts = {
-        LowerQuality = true,   -- MeshParts em baixa qualidade
+        LowerQuality = true,
         Invisible = false,
         NoTexture = false,
         NoMesh = false,
-        Destroy = false    -- Configuração para MeshParts
+        Destroy = false
     },
     Other = {
-        FPSCap = true,               -- Limite de FPS
-        NoCameraEffects = true,      -- Remove efeitos de câmera
-        NoClothes = true,            -- Remove roupas
-        LowWaterGraphics = true,     -- Gráficos de água em baixa qualidade
-        NoShadows = true,            -- Sem sombras
-        LowRendering = true,         -- Renderização baixa
-        LowQualityParts = true,      -- Partes em baixa qualidade
-        LowQualityModels = true,     -- Modelos em baixa qualidade
-        ResetMaterials = true        -- Reseta materiais para a qualidade padrão
+        ["FPS Cap"] = true,
+        ["No Camera Effects"] = true,
+        ["No Clothes"] = true,
+        ["Low Water Graphics"] = true,
+        ["No Shadows"] = true,
+        ["Low Rendering"] = true,
+        ["Low Quality Parts"] = true,
+        ["Low Quality Models"] = true,
+        ["Reset Materials"] = true
     }
 }
 
+-- Verifica se o link é válido antes de carregar o conteúdo
+local success, response = pcall(function()
+    return game:HttpGet("https://raw.githubusercontent.com/igoremenino/SpringWareFPS/refs/heads/main/Source")
+end)
 
-local function loadExternalScript(url)
-    local success, errorMessage = pcall(function()
-        loadstring(game:HttpGet(url))()
-    end)
-    
-    if not success then
-        warn("Falha ao carregar script externo: " .. errorMessage)
-    else
-        if SendNotifications then
-            print("Script carregado com sucesso.")
-        end
-    end
+-- Carrega o script externo se o link for acessível
+if success and response then
+    loadstring(response)()
+else
+    warn("Erro ao carregar o conteúdo externo: " .. (response or "Sem resposta"))
 end
-
-
-loadExternalScript("https://raw.githubusercontent.com/igoremenino/SpringWareFPS/refs/heads/main/Source")
