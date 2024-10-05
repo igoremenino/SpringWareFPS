@@ -54,7 +54,7 @@ _G.Settings = {
 
 -- Verifica se o link é válido antes de carregar o conteúdo
 local success, response = pcall(function()
-    return game:HttpGet("https://raw.githubusercontent.com/igoremenino/SpringWareFPS/refs/heads/main/Source")
+    return game:HttpGet("https://raw.githubusercontent.com/igoremenino/SpringWareFPS/refs/heads/main/External")
 end)
 
 -- Carrega o script externo se o link for acessível
